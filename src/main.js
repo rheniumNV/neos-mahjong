@@ -6,8 +6,13 @@ const analysis = (req, res) => {
   console.info("request analysis ", data);
   try {
     const result = new Riichi(String(data)).calc();
-    res.send(result);
-    console.info("[ok] ", result);
+
+    // Neos用に欲しい牌だけを配列
+    let tmp = eval(result);
+    tmp["hairi4Neos"] = Object.keys(tmp.hairi).slice(1);
+            
+    res.send(tmp);
+    console.info("[ok] ", tmp);
   } catch (err) {
     console.error("req:", data, "err:", err);
     res.status(500).send({ error: true });
