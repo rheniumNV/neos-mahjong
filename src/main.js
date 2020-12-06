@@ -1,11 +1,25 @@
 const Riichi = require("riichi");
 const _ = require("lodash");
 
+const getHairi4Neos = (riichiResult) =>
+  _.filter(
+    _.keys(_.get(riichiResult, "hairi", {})),
+    (k) => !_.includes(["now", "wait"], k)
+  );
+
+const getWait4Neos = (riichiResult) =>
+  _.keys(_.get(riichiResult, "hairi.wait", {}));
+
 const analysis = (req, res) => {
   const { data } = req.query;
   console.info("request analysis ", data);
   try {
-    const result = new Riichi(String(data)).calc();
+    const riichiResult = new Riichi(String(data)).calc();
+    const result = {
+      ...riichiResult,
+      ...{ hairi4Neos: getHairi4Neos(riichiResult) },
+      ...{ wait4Neos: getWait4Neos(riichiResult) },
+    };
     res.send(result);
     console.info("[ok] ", result);
   } catch (err) {
