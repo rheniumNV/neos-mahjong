@@ -1,22 +1,10 @@
-const Riichi = require("riichi");
-const _ = require("lodash");
+const analysis = require("./analysis");
 
-const analysis = (req, res) => {
-  const { data } = req.query;
-  console.info("request analysis ", data);
-  try {
-    const result = new Riichi(String(data)).calc();
-    res.send(result);
-    console.info("[ok] ", result);
-  } catch (err) {
-    console.error("req:", data, "err:", err);
-    res.status(500).send({ error: true });
-  }
+const hello = (_req, res) => {
+  res.send("hello");
 };
 
 exports.routes = (app) => {
-  app.get("/", (_req, res) => {
-    res.send("hello");
-  });
-  app.get("/v1/analysis", analysis);
+  app.get("/", hello);
+  app.get("/v1/analysis", analysis.call);
 };
