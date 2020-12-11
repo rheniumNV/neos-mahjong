@@ -8,8 +8,10 @@ const getHairi4Neos = (riichiResult) =>
     (k) => !_.includes(["now", "wait"], k)
   );
 
-const getWait4Neos = (riichiResult) =>
-  _.keys(_.get(riichiResult, "hairi.wait", {}));
+const getAgari4Neos = (riichiResult) =>
+  _.get(riichiResult, "hairi.now", -1) == 0
+    ? _.keys(_.get(riichiResult, "hairi.wait", {}))
+    : [];
 
 const generateHaiObject = (number, type) => ({
   number: number == 0 ? 5 : number,
@@ -41,6 +43,7 @@ const getSortIndex = ({ number, type }) => [
   _.get(typeIndexConvertMap, type, 100),
   number,
 ];
+const filterNakiString = (data) => _.get(_.split(data, "+"), "0", "");
 const parseHaiObject = (data) => {
   const list = _.map(data, (char, index) =>
     isNumberChar(char)
@@ -68,10 +71,11 @@ const getPonList = (haiList) =>
     ),
     (haiCountData) => haiCountData.hai
   );
-const getPon4Neos = (haiList) => _.map(getPonList(haiList), formatHaiObject);
+const getPon4Neos = (tehaiList) =>
+  _.map(getPonList(tehaiList), formatHaiObject);
 exports.getPon4Neos = getPon4Neos;
 
-const getChii4Neos = (haiList) => ["4m"];
+const getChii4Neos = (tehaiList) => ["4m"];
 exports.getChii4Neos = getChii4Neos;
 
 exports.call = (req, res) => {
@@ -79,12 +83,12 @@ exports.call = (req, res) => {
   console.info("request analysis ", data);
   try {
     const riichiResult = new Riichi(String(data)).calc();
-    const haiList = parseHaiObject(data);
+    const tehaiList = parseHaiObject(filterNakiString(data));
     const result = {
       ...riichiResult,
       ...{ hairi4Neos: getHairi4Neos(riichiResult) },
-      ...{ wait4Neos: getWait4Neos(riichiResult) },
-      ...{ pon4Noes: getPon4Neos(haiList) },
+      ...{ agari4Neos: getAgari4Neos(riichiResult) },
+      ...{ pon4Noes: getPon4Neos(tehaiList) },
       //...{ chii4Noes: getChii4Neos(haiList) },
     };
     res.send(result);
