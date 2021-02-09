@@ -13,6 +13,17 @@ const getAgari4Neos = (riichiResult) =>
     ? _.keys(_.get(riichiResult, "hairi.wait", {}))
     : [];
 
+const getAgari4Neos713 = (riichiResult) =>
+  _.get(riichiResult, "hairi7and13.now", -1) == 0
+    ? _.keys(_.get(riichiResult, "hairi7and13.wait", {}))
+    : [];
+
+const getWait4Neos = (riichiResult) =>
+  _.keys(_.get(riichiResult, "hairi.wait", []));
+
+const getWait4Neos713 = (riichiResult) =>
+  _.keys(_.get(riichiResult, "hairi7and13.wait", []));
+
 const generateHaiObject = (number, type) => ({
   number: number == 0 ? 5 : number,
   type: type,
@@ -88,6 +99,9 @@ exports.call = (req, res) => {
       ...riichiResult,
       ...{ hairi4Neos: getHairi4Neos(riichiResult) },
       ...{ agari4Neos: getAgari4Neos(riichiResult) },
+      ...{ agari4Neos713: getAgari4Neos713(riichiResult) },
+      ...{ wait4Neos: getWait4Neos(riichiResult) },
+      ...{ wait4Neos713: getWait4Neos713(riichiResult) },
       ...{ pon4Noes: getPon4Neos(tehaiList) },
       //...{ chii4Noes: getChii4Neos(haiList) },
     };
