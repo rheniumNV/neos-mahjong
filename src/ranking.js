@@ -27,20 +27,35 @@ exports.index = async (req, res, _next) => {
       sort
     );
 
-  const genRankingText = (ranking, keyName) =>
+  const genRankingNameText = (ranking) =>
     _.join(
       _.map(ranking, (ur, index) =>
-        util.format("%d %s %s", index + 1, ur.user.name, _.get(ur, keyName))
+        util.format("%d. %s", index + 1, ur.user.name)
       ),
+      "\n"
+    );
+  const genRankingValueText = (ranking, keyName, format = (v) => v) =>
+    _.join(
+      _.map(ranking, (ur) => util.format("%s", format(_.get(ur, keyName)))),
       "\n"
     );
 
   const timeRanking = genRanking("time", "asc");
-  const timeRankingText = genRankingText(timeRanking, "time");
-  const tenRanking = genRanking("ten", "desc");
-  const tenRankingText = genRankingText(tenRanking, "ten");
+  const timeRankingNameText = genRankingNameText(timeRanking);
+  const timeRankingValueText = genRankingValueText(timeRanking, "time", (v) =>
+    v.toFixed(1)
+  );
 
-  res.send({ timeRankingText, tenRankingText });
+  const tenRanking = genRanking("ten", "desc");
+  const tenRankingNameText = genRankingNameText(tenRanking);
+  const tenRankingValueText = genRankingValueText(tenRanking, "ten");
+
+  res.send({
+    timeRankingNameText,
+    timeRankingValueText,
+    tenRankingNameText,
+    tenRankingValueText,
+  });
 };
 
 exports.create = async (req, res, _next) => {
