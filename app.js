@@ -18,7 +18,7 @@ Main.routes(app);
 app.use((err, req, res, _next) => {
   console.error(
     util.format(
-      "[Error] {0} {1} body={2} error={3}",
+      "[Error] %s %s body=%s error=%s",
       req.method,
       req.url,
       JSON.stringify(req.body),
@@ -31,7 +31,7 @@ app.use((err, req, res, _next) => {
 app.use((req, res, _next) => {
   console.warn(
     util.format(
-      "[Warn] {0} {1} body={2} routeing not found",
+      "[Warn] %s %s body=%s routeing not found",
       req.method,
       req.url,
       JSON.stringify(req.body)
