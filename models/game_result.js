@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       text: DataTypes.STRING,
       yaku: DataTypes.STRING,
       bet: DataTypes.FLOAT,
-      kfc: DataTypes.FLOAT,
+      tehai: DataTypes.STRING,
       rate: DataTypes.FLOAT,
       tumo_count: DataTypes.INTEGER,
     },

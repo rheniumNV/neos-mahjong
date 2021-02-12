@@ -36,8 +36,8 @@ module.exports = {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
-      kfc: {
-        type: Sequelize.FLOAT,
+      tehai: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
       rate: {
