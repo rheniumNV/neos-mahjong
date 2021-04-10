@@ -55,6 +55,8 @@ const getSortIndex = ({ number, type }) => [
   number,
 ];
 const filterNakiString = (data) => _.get(_.split(data, "+"), "0", "");
+exports.filterNakiString = filterNakiString;
+
 const parseHaiObject = (data) => {
   const list = _.map(data, (char, index) =>
     isNumberChar(char)
