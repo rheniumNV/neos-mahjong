@@ -81,19 +81,22 @@ exports.index = async (req, res, _next) => {
 
   const haiEMoji = (haiStr) => _.get(haiEmojiMap, haiStr, " ");
 
+  const getEmojiTehaiFunc = (ur) => {
+    const tehaiObjList = _.filter(
+      analysis.parseHaiObject(
+        analysis.filterNakiString(_.first(_.split(ur.tehai, "%")))
+      ),
+      ({ number, type }) => number && type
+    );
+    const tehaiStr = _.map(tehaiObjList, (ele) =>
+      haiEMoji(util.format("%s%s", ele.number, ele.type))
+    );
+    return tehaiStr;
+  };
+
   const genRankingTehaiText = (ranking) =>
     _.join(
-      _.map(ranking, (ur, index) =>
-        _.join(
-          _.map(
-            _.map(
-              analysis.parseHaiObject(analysis.filterNakiString(ur.tehai)),
-              (ele) => haiEMoji(util.format("%s%s", ele.number, ele.type))
-            )
-          ),
-          ""
-        )
-      ),
+      _.map(ranking, (ur, index) => _.join(_.map(getEmojiTehaiFunc(ur)), "")),
       "\n"
     );
 
