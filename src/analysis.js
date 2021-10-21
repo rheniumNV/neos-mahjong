@@ -1,3 +1,4 @@
+const json2emap = require("json2emap");
 const Riichi = require("riichi");
 const _ = require("lodash");
 const { forEach } = require("lodash");
@@ -5,6 +6,12 @@ const { forEach } = require("lodash");
 const getHairi4Neos = (riichiResult) =>
   _.filter(
     _.keys(_.get(riichiResult, "hairi", {})),
+    (k) => !_.includes(["now", "wait"], k)
+  );
+
+const getHairi4Neos713 = (riichiResult) =>
+  _.filter(
+    _.keys(_.get(riichiResult, "hairi7and13", {})),
     (k) => !_.includes(["now", "wait"], k)
   );
 
@@ -91,8 +98,111 @@ exports.getPon4Neos = getPon4Neos;
 const getChii4Neos = (tehaiList) => ["4m"];
 exports.getChii4Neos = getChii4Neos;
 
+exports.callV2 = (req, res) => {
+  const { data, useEmap = false, allowKuitan = true } = req.query;
+  console.info("request analysis ", data);
+  try {
+    const resFormat = {
+      isAgari: false,
+      error: false,
+      han: 0,
+      fu: 0,
+      ten: 0,
+      name: "",
+      text: "",
+      yaku4Neos: [],
+      autoSyanten: 999,
+      agariType: "normal",
+      autoHairi4Neos: [],
+      autoAgari4Neos: [],
+      autoWait4Neos: [],
+      pon4Neos: [],
+      chii4Neos: [],
+      kan4Neos: [],
+    };
+    const riichi = new Riichi(String(data));
+    if (!allowKuitan) {
+      riichi.disableKuitan();
+    }
+    const riichiResult = riichi.calc();
+    const tehaiList = parseHaiObject(filterNakiString(data));
+
+    const yaku4Neos = _.map(_.get(riichiResult, "yaku", {}), (value, key) => ({
+      name: key,
+      han: _.parseInt(_.get(_.split(value, "飜"), "0")),
+      hanText: value,
+    }));
+
+    const ignore = (number) => (number >= 0 ? number : 999);
+    const syanten = ignore(_.get(riichiResult, ["hairi", "now"], -1));
+    const syanten713 = ignore(_.get(riichiResult, ["hairi713", "now"], -1));
+    const agariType = (() => {
+      switch (true) {
+        case syanten == syanten713:
+          return "both";
+        case syanten > syanten713:
+          return "713";
+        case syanten < syanten713:
+          return "normal";
+        default:
+          return "normal";
+      }
+    })();
+
+    const agariSwitch = (valueNormal, value713, valueBoth) =>
+      _.get({ normal: valueNormal, 713: value713, both: valueBoth }, agariType);
+
+    const autoSyanten = agariSwitch(syanten, syanten713, syanten);
+
+    const hairi4Neos = getHairi4Neos(riichiResult);
+    const hairi4Neos713 = getHairi4Neos713(riichiResult);
+    const autoHairi4Neos = agariSwitch(
+      hairi4Neos,
+      hairi4Neos713,
+      _.uniq(_.concat(hairi4Neos, hairi4Neos713))
+    );
+
+    const agari4Neos = getAgari4Neos(riichiResult);
+    const agari4Neos713 = getAgari4Neos713(riichiResult);
+    const autoAgari4Neos = agariSwitch(
+      agari4Neos,
+      agari4Neos713,
+      _.uniq(_.concat(agari4Neos, agari4Neos713))
+    );
+
+    const wait4Neos = getWait4Neos(riichiResult);
+    const wait4Neos713 = getWait4Neos713(riichiResult);
+    const autoWait4Neos = agariSwitch(
+      wait4Neos,
+      wait4Neos713,
+      _.uniq(_.concat(wait4Neos, wait4Neos713))
+    );
+
+    const pon4Noes = getPon4Neos(tehaiList);
+
+    const result = {
+      ...resFormat,
+      ...riichiResult,
+      ...{
+        yaku4Neos,
+        agariType,
+        autoSyanten,
+        autoHairi4Neos,
+        autoAgari4Neos,
+        autoWait4Neos,
+        pon4Noes,
+      },
+    };
+    res.send(useEmap ? json2emap(result) : result);
+    console.info("[ok] ", result);
+  } catch (err) {
+    console.error("req:", data, "err:", err);
+    res.status(500).send({ error: true });
+  }
+};
+
 exports.call = (req, res) => {
-  const { data } = req.query;
+  const { data, useEmap = false } = req.query;
   console.info("request analysis ", data);
   try {
     const riichiResult = new Riichi(String(data)).calc();
@@ -107,7 +217,7 @@ exports.call = (req, res) => {
       ...{ pon4Noes: getPon4Neos(tehaiList) },
       //...{ chii4Noes: getChii4Neos(haiList) },
     };
-    res.send(result);
+    res.send(useEmap ? json2emap(result) : result);
     console.info("[ok] ", result);
   } catch (err) {
     console.error("req:", data, "err:", err);
