@@ -138,7 +138,7 @@ exports.callV2 = (req, res) => {
 
     const ignore = (number) => (number >= 0 ? number : 999);
     const syanten = ignore(_.get(riichiResult, ["hairi", "now"], -1));
-    const syanten713 = ignore(_.get(riichiResult, ["hairi713", "now"], -1));
+    const syanten713 = ignore(_.get(riichiResult, ["hairi7and13", "now"], -1));
     const agariType = (() => {
       switch (true) {
         case syanten == syanten713:
