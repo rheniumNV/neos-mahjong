@@ -105,6 +105,7 @@ exports.callV2 = (req, res) => {
     const resFormat = {
       isAgari: false,
       error: false,
+      isTumo: false,
       han: 0,
       fu: 0,
       ten: 0,
@@ -126,6 +127,8 @@ exports.callV2 = (req, res) => {
     }
     const riichiResult = riichi.calc();
     const tehaiList = parseHaiObject(filterNakiString(data));
+
+    const isTumo = riichi.isTsumo;
 
     const yaku4Neos = _.map(_.get(riichiResult, "yaku", {}), (value, key) => ({
       name: key,
@@ -184,6 +187,7 @@ exports.callV2 = (req, res) => {
       ...resFormat,
       ...riichiResult,
       ...{
+        isTumo,
         yaku4Neos,
         agariType,
         autoSyanten,
