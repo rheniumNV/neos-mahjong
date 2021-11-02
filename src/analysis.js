@@ -127,6 +127,7 @@ exports.callV2 = (req, res) => {
       chii4Neos: [],
       ankan4Neos: [],
       minkan4Neos: [],
+      toitu4Neos: [],
     };
     const riichi = new Riichi(String(data));
     if (!allowKuitan) {
@@ -212,6 +213,11 @@ exports.callV2 = (req, res) => {
       (value, key) => key
     );
 
+    const toitu4Neos = _.map(
+      _.filter(pon4Noes2, ({ value: { minkan, ankan } }) => !minkan && !ankan),
+      ({ key }) => key
+    );
+
     const result = {
       ...resFormat,
       ...riichiResult,
@@ -227,6 +233,7 @@ exports.callV2 = (req, res) => {
         minkan4Neos,
         ankan4Neos,
         chii4Neos,
+        toitu4Neos,
       },
     };
     res.send(useEmap ? json2emap(result) : result);
