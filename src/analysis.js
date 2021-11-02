@@ -28,6 +28,12 @@ const getAgari4Neos713 = (riichiResult) =>
 const getWait4Neos = (riichiResult) =>
   _.keys(_.get(riichiResult, "hairi.wait", []));
 
+const getPon4NeosAnalysis = (riichiResult) =>
+  _.get(riichiResult, "pon.wait", []);
+
+const getChii4NeosAnalysis = (riichiResult) =>
+  _.get(riichiResult, "chi.wait", []);
+
 const getWait4Neos713 = (riichiResult) =>
   _.keys(_.get(riichiResult, "hairi7and13.wait", []));
 
@@ -119,7 +125,8 @@ exports.callV2 = (req, res) => {
       autoWait4Neos: [],
       pon4Neos: [],
       chii4Neos: [],
-      kan4Neos: [],
+      ankan4Neos: [],
+      minkan4Neos: [],
     };
     const riichi = new Riichi(String(data));
     if (!allowKuitan) {
@@ -181,7 +188,29 @@ exports.callV2 = (req, res) => {
       _.uniq(_.concat(wait4Neos, wait4Neos713))
     );
 
-    const pon4Noes = getPon4Neos(tehaiList);
+    const pon4Noes2 = _.map(
+      getPon4NeosAnalysis(riichiResult),
+      (value, key) => ({
+        value,
+        key,
+      })
+    );
+
+    const pon4Neos = _.map(pon4Noes2, ({ key }) => key);
+
+    const minkan4Neos = _.map(
+      _.filter(pon4Noes2, ({ value: { minkan } }) => minkan),
+      ({ key }) => key
+    );
+    const ankan4Neos = _.map(
+      _.filter(pon4Noes2, ({ value: { ankan } }) => ankan),
+      ({ key }) => key
+    );
+
+    const chii4Neos = _.map(
+      getChii4NeosAnalysis(riichiResult),
+      (value, key) => key
+    );
 
     const result = {
       ...resFormat,
@@ -194,7 +223,10 @@ exports.callV2 = (req, res) => {
         autoHairi4Neos,
         autoAgari4Neos,
         autoWait4Neos,
-        pon4Noes,
+        pon4Neos,
+        minkan4Neos,
+        ankan4Neos,
+        chii4Neos,
       },
     };
     res.send(useEmap ? json2emap(result) : result);
