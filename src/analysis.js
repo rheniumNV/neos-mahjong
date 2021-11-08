@@ -1,5 +1,5 @@
 const json2emap = require("json2emap");
-const Riichi = require("riichi");
+const Riichi = require("riichi_hinabuild"); //require("riichi");
 const _ = require("lodash");
 const { forEach } = require("lodash");
 
@@ -105,7 +105,14 @@ const getChii4Neos = (tehaiList) => ["4m"];
 exports.getChii4Neos = getChii4Neos;
 
 exports.callV2 = (req, res) => {
-  const { data, useEmap = false, allowKuitan = true } = req.query;
+  const {
+    data,
+    useEmap = false,
+    allowKuitan = true,
+    isSanma = false,
+    isTumozon = true,
+    honba = 0,
+  } = req.query;
   console.info("request analysis ", data);
   try {
     const resFormat = {
@@ -129,10 +136,21 @@ exports.callV2 = (req, res) => {
       minkan4Neos: [],
       toitu4Neos: [],
     };
-    const riichi = new Riichi(String(data));
+
+    const option = {
+      sanma: isSanma,
+      tsumozon: isTumozon,
+      honba,
+    };
+    console.log(option);
+
+    const riichi = new Riichi(String(data), option);
     if (!allowKuitan) {
       riichi.disableKuitan();
     }
+    riichi.enableLocalYaku("大車輪");
+    riichi.enableLocalYaku("大竹林");
+    riichi.enableLocalYaku("大数隣");
     const riichiResult = riichi.calc();
     const tehaiList = parseHaiObject(filterNakiString(data));
 
