@@ -19,6 +19,7 @@
     "moment": "^2.29.1",
     "pg": "^8.5.1",
     "riichi": "git+https://github.com/HinanoAira/riichi.git",
+    "riichi_hinabuild": "git+https://github.com/HinanoAira/riichi.git",
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0"
   },
